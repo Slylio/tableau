@@ -1,3 +1,5 @@
+#ifndef TABLEAU
+#define TABLEAU
 #include <mutex>
 #include <iostream>
 #include <vector>
@@ -10,19 +12,17 @@ class Tableau{
     public:
         //Constructeur par défaut
         Tableau(int tableSize=0){
-            std::cout<< "Construction d'un tableau vide de "<< tableSize <<"a l'adresse "<< &tableau <<"\n";
+            std::cout<< "Construction d'un tableau vide de "<< tableSize <<" elements a l'adresse "<< &tableau <<"\n";
             size=tableSize;
-            for (int i=0;i<tableSize;i++){
+            for (int i=0;i<size;i++){
                 add(0);
             }
         }
-        
-        template<class ... U>
-        Tableau(U ... args):Tableau({args...}){}
+
 
         //Constructeur avec une liste
         Tableau(std::initializer_list<T> l){
-            std::cout<< "Construction de " << l.size() << " elements a l'adresse "<< &tableau <<"\n";
+            std::cout<< "Construction d'un tableau de " << l.size() << " elements a l'adresse "<< &tableau <<"\n";
             this->size=l.size();
              for (const auto& e : l){
                 add(e);
@@ -31,6 +31,8 @@ class Tableau{
         }
 
         
+        template<class ... U>
+        Tableau(U ... args):Tableau({args...}){}
 
         ~Tableau(){delete[] tableau;}
 
@@ -50,18 +52,22 @@ class Tableau{
             std::cout<<'\n';
         }
 
+        T& operator[](int i) const{
+            return tableau[i];
+        }
+
+        T& operator()(int i) const{
+            try {
+                return tableau[i];
+            } catch (const std::out_of_range& oor){
+                std::cerr<<"Out of range error\n";
+            }
+        }
         private :
             T* tableau;
             int size;
 
 };
 
-int main(){
-    Tableau<double> t0; //Création d’un tableau vide
-    Tableau<int> t1(3); //Création d’un tableau de 3 éléments
-    //Création d’un tableau de 5 éléments initialisés à 2,3,4,6,6
-    Tableau<double> t2 = {2, 3, 4, 6, 6};
-    //Création d’un tableau de 3 éléments initialisés à 7,8,9
-    const Tableau<int>* t3=new Tableau<int>{7,8,9};
-    //Tableau<float> extr(2.,5.5,6.3,8.,9.9);
-}
+
+#endif
